@@ -7,6 +7,6 @@
 
 #include "base.h"
 
-#define pbase_init()		TINY0_init()
+#define pbase_init()		AVR0_init()
 
 #endif /* PBASE_H_ */

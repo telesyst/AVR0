@@ -5,6 +5,6 @@
 #ifndef BASE_H_
 #define BASE_H_
 
-	#include "TINY0.h"
+	#include "AVR0.h"
 
 #endif /* BASE_H_ */

@@ -1,9 +1,8 @@
 /*
- *	TINY0_EEprom.c
- *  TINY V2 core
+ *	AVR0_EEprom.c
  *  Author: Nikola Kirov
  */
-#include "TINY0.h"
+#include "AVR0.h"
 
 #ifdef ASTART_PROJECT
 	#include "ccp.h"

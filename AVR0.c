@@ -5,7 +5,7 @@
  */ 
 
 #define ATOMIC_H  // disable inclusion of atomic.h. 
-#include "TINY0.h"
+#include "AVR0.h"
 
 #ifdef ASTART_PROJECT
 #include "ccp.h"
@@ -114,6 +114,10 @@ char SDO_buff[SDO_DEBUGS_BUFF_SIZE];
 	unsigned volatile * tca_counter = (unsigned volatile *)&TCA0.SINGLE.CNT;
 #endif
 
+#if MS_TICK_ENABLE == TRUE	
+	void msInit(void);
+#endif
+
 __weak void error_rise_led(ut number)
 {
 	irqdis();
@@ -186,7 +190,7 @@ ms_t msGet(void)
 }
 #endif
 
-void TINY0_init( void )
+void AVR0_init( void )
 {
 #ifdef ASTART_PROJECT	
 	atmel_start_init();
@@ -218,6 +222,12 @@ void TINY0_init( void )
 #endif // #if TCA0_MS_DELAY_ENABLE
 
 	base_tools_init();
+	
+#if MS_TICK_ENABLE == TRUE	
+	msInit();
+	msStart();
+#endif
+	
 	DBG_INIT();
 	irqen();
 }
@@ -238,19 +248,19 @@ ISR(TCB0_INT_vect)
 	TCB0.INTFLAGS = 1;
 }
 
-void msInit(void)
+__weak void msInit(void)
 {
 	TCB0.CCMP = F_CPU/1000;
 	TCB0.CTRLA = TCB_ENABLE_bm;
 	TCB0.INTCTRL = 1;
 }
 
-void msStop(void)
+__weak void msStop(void)
 {
 	TCB0.CTRLA = 0;
 }
 
-void msStart(void)
+__weak void msStart(void)
 {
 	TCB0.CTRLA = TCB_ENABLE_bm;
 }
