@@ -5,7 +5,7 @@
 #ifndef TINY0_H_
 #define TINY0_H_
 	
-	#define TINY0_VERSION				002
+	#define AVR0_VERSION				001
 	
 	#include "Common_cfg.h"
 

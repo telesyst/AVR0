@@ -28,7 +28,7 @@
 #define WDT_TIMEOUT_PERIOD_4S						10
 #define WDT_TIMEOUT_PERIOD_8S						11
 
-#ifndef MS_TICK_ENABLE
+#ifndef MS_TICK_IMPLEMENTATION_ENABLE
 	#error
 #endif
 
@@ -41,11 +41,13 @@
 #endif
 
 #ifdef PROGSTR_BUFF_SIZE
-char progstr_buff[PROGSTR_BUFF_SIZE];
+	char progstr_buff[PROGSTR_BUFF_SIZE];
 #endif
 
-#ifdef SDO_DEBUGS_BUFF_SIZE
-char SDO_buff[SDO_DEBUGS_BUFF_SIZE];
+#if DEBUG_OUT == TRUE 
+	#ifdef DBGS_BUFF_SIZE
+		char DBGS_buff[DBGS_BUFF_SIZE];
+	#endif
 #endif
 
 #if !defined(BASE_TOOLS_ENABLE_MS_DELAY)  || !defined(BASE_TOOLS_USE_EXT_MSGET)
@@ -60,7 +62,7 @@ char SDO_buff[SDO_DEBUGS_BUFF_SIZE];
 	#error
 #endif
 
-#if TCA0_MS_DELAY_ENABLE && MS_TICK_ENABLE
+#if TCA0_MS_DELAY_ENABLE && MS_TICK_IMPLEMENTATION_ENABLE
 	#error // only one can be allowed 
 #endif
 
@@ -72,7 +74,7 @@ char SDO_buff[SDO_DEBUGS_BUFF_SIZE];
 	#error // TCA0 used in both 
 #endif
 
-#ifndef MS_CORRECT
+#ifndef BASE_TOOLS_MS_CORRECT
 	#error
 #endif
 
@@ -82,27 +84,27 @@ char SDO_buff[SDO_DEBUGS_BUFF_SIZE];
 	#endif
 	
 	#if F_CPU == 500000ul
-		#if MS_CORRECT != 2
+		#if BASE_TOOLS_MS_CORRECT != 2
 			#error
 		#endif
 	#elif F_CPU == 1000000ul
-		#if MS_CORRECT != 1
+		#if BASE_TOOLS_MS_CORRECT != 1
 			#error
 		#endif
 	#elif F_CPU == 2000000ul
-		#if MS_CORRECT != 2
+		#if BASE_TOOLS_MS_CORRECT != 2
 			#error
 		#endif
 	#elif (F_CPU == 4000000ul) 
-		#if MS_CORRECT != 4
+		#if BASE_TOOLS_MS_CORRECT != 4
 			#error
 		#endif
 	#elif (F_CPU == 8000000ul) 
-		#if MS_CORRECT != 8
+		#if BASE_TOOLS_MS_CORRECT != 8
 			#error
 		#endif
 	#elif (F_CPU == 16000000ul) 
-		#if MS_CORRECT != 16
+		#if BASE_TOOLS_MS_CORRECT != 16
 			#error
 		#endif
 	#else
@@ -114,7 +116,7 @@ char SDO_buff[SDO_DEBUGS_BUFF_SIZE];
 	unsigned volatile * tca_counter = (unsigned volatile *)&TCA0.SINGLE.CNT;
 #endif
 
-#if MS_TICK_ENABLE == TRUE	
+#if MS_TICK_IMPLEMENTATION_ENABLE == TRUE	
 	void msInit(void);
 #endif
 
@@ -175,8 +177,8 @@ void msDelay(ms_t delay)
 
 ut msIsTimeElapsed(ms_t start_time, ms_t time)
 {
-#if MS_CORRECT > 1	
-	time *= MS_CORRECT;
+#if BASE_TOOLS_MS_CORRECT > 1	
+	time *= BASE_TOOLS_MS_CORRECT;
 #endif
 	return (TCA0.SINGLE.CNT - start_time) >= time;
 }
@@ -223,19 +225,19 @@ void AVR0_init( void )
 
 	base_tools_init();
 	
-#if MS_TICK_ENABLE == TRUE	
+#if MS_TICK_IMPLEMENTATION_ENABLE == TRUE	
 	msInit();
 	msStart();
 #endif
 	
-	DBG_INIT();
+	DBGINIT();
 	irqen();
 }
 
 //================================================//
 //========= Milisecond Tick implementation =======//
 //================================================//
-#if MS_TICK_ENABLE == TRUE	
+#if MS_TICK_IMPLEMENTATION_ENABLE == TRUE	
 
 #ifndef TCB0
 	#error
@@ -290,7 +292,7 @@ __weak void msStart(void)
 #endif
 
 #if US_TMR_TCB_INDEX == 0 
-	#if MS_TICK_ENABLE == TRUE
+	#if MS_TICK_IMPLEMENTATION_ENABLE == TRUE
 		#error "TCB0 in use"
 	#endif
 	#define US_TMR		TCB0			
