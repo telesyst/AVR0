@@ -18,15 +18,18 @@
 	#define READ_WORD(const_arr, index)			__LPM_word(const_arr + index)
 	#define READ_DWORD(const_arr, index)		__LPM_dword(const_arr + index)
 	#define READ_FLOAT(const_arr, index)		__LPM_float(const_arr + index)
+	#ifndef ENTER_CRITICAL
+		#define ENTER_CRITICAL()					\
+			{   									\
+				u8 SaveSREG = SREG;					\
+				cli();
+	#endif
 
-	#define ENTER_CRITICAL()					\
-	{   										\
-		u8 SaveSREG = SREG;						\
-		cli();
-
-	#define EXIT_CRITICAL()						\
-		SREG = SaveSREG;						\
-	}
+	#ifndef EXIT_CRITICAL
+		#define EXIT_CRITICAL()						\
+			SREG = SaveSREG;						\
+		}
+	#endif
 
 	#define WDR()								__asm__ __volatile__ ("wdr")
 	#define WD_RESET()							__asm__ __volatile__ ("wdr")
@@ -42,11 +45,15 @@
 	#define READ_DWORD(const_arr, index)		(*(u32 __flash *)(a))
 	#define READ_FLOAT(const_arr, index)		(*(float __flash *)(a))
 
-	#define ENTER_CRITICAL(){   							\
-		unsigned char SaveSREG = __save_interrupt();		\
-		__disable_interrupt();                                  
-			
+	#ifndef ENTER_CRITICAL 
+		#define ENTER_CRITICAL(){   							\
+			unsigned char SaveSREG = __save_interrupt();		\
+			__disable_interrupt();                                  
+	#endif
+
+#ifndef EXIT_CRITICAL 	
 	#define EXIT_CRITICAL()	 __restore_interrupt(SaveSREG);  }
+#endif
 			
 	#define WD_RESET()                      	__watchdog_reset()
 	#define WDR()								__watchdog_reset()	
